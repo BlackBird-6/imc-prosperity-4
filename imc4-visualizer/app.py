@@ -541,20 +541,34 @@ def update_price_chart(n_clicks, product, round_name, min_ts, max_ts, data_range
         hovertemplate="Timestamp: %{x}<br>Mid: %{y:.1f}<extra></extra>",
     ))
 
-    # Trade markers
-    if len(trades) > 0:
-        t = trades[trades["symbol"] == product]
-        t = t[(t["global_ts"] >= mn) & (t["global_ts"] <= mx)]
-        if len(t) > 0:
-            fig.add_trace(go.Scatter(
-                x=t["global_ts"], y=t["price"],
-                mode="markers", name=f"Trades (n={len(t)})",
-                marker=dict(
-                    color=COLORS["amber"], size=t["quantity"].clip(2, 12),
-                    opacity=0.7, line=dict(width=0.5, color="#d97706"),
-                ),
-                hovertemplate="Trade @ %{x}<br>Price: %{y:.1f}<br>Qty: %{marker.size}<extra></extra>",
-            ))
+    # Order markers (L1 Bids and Asks) instead of Trades
+    has_bid = p["bid_price_1"].notna() & p["bid_volume_1"].notna()
+    p_bid = p[has_bid]
+    if len(p_bid) > 0:
+        fig.add_trace(go.Scatter(
+            x=p_bid["global_ts"], y=p_bid["bid_price_1"],
+            mode="markers", name="Buy Orders (L1)",
+            marker=dict(
+                color=COLORS["green"], size=p_bid["bid_volume_1"].clip(2, 15),
+                opacity=0.5, line=dict(width=0.5, color="#15803d"),
+            ),
+            text=p_bid["bid_volume_1"],
+            hovertemplate="Buy Order @ %{x}<br>Price: %{y:.1f}<br>Vol: %{text}<extra></extra>",
+        ))
+
+    has_ask = p["ask_price_1"].notna() & p["ask_volume_1"].notna()
+    p_ask = p[has_ask]
+    if len(p_ask) > 0:
+        fig.add_trace(go.Scatter(
+            x=p_ask["global_ts"], y=p_ask["ask_price_1"],
+            mode="markers", name="Sell Orders (L1)",
+            marker=dict(
+                color=COLORS["red"], size=p_ask["ask_volume_1"].clip(2, 15),
+                opacity=0.5, line=dict(width=0.5, color="#b91c1c"),
+            ),
+            text=p_ask["ask_volume_1"],
+            hovertemplate="Sell Order @ %{x}<br>Price: %{y:.1f}<br>Vol: %{text}<extra></extra>",
+        ))
 
     # Day boundaries
     days_sorted = sorted(prices[prices["product"] == product]["day"].unique())
