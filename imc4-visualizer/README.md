@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Prosperity 4 — Market Analyzer
 
-## Getting Started
+Interactive market data dashboard for IMC Prosperity 4, built with Plotly Dash.
 
-First, run the development server:
+## Quick Start
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pip install -r requirements.txt
+python app.py
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open **http://localhost:8050** in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Data
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Place trading data in `../trading-data/ROUND*/` relative to this directory. The app auto-discovers all `ROUND*` folders on startup.
 
-## Learn More
+Expected CSV structure (semicolon-delimited):
+- `prices_round_<N>_day_<D>.csv` — order book snapshots (bid/ask levels 1–3, mid price)
+- `trades_round_<N>_day_<D>.csv` — executed trades (symbol, price, quantity)
 
-To learn more about Next.js, take a look at the following resources:
+Days are stitched into a continuous timeline using `global_ts = day_index * 1,000,000 + timestamp`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Product & round selectors** — switch between products and trading rounds
+- **Timestamp range controls** — integer min/max inputs to zoom into any time window
+- **Price chart** — mid-price line with bid-ask band, trade markers (sized by quantity), and day boundary lines
+- **Order book viewer** — click any chart point to see the L1–L3 bid/ask depth at that timestamp
+- **Spread distribution** — histogram with median annotation
+- **Trade size distribution** — histogram with count, mean, and total volume
+- **Volume profile** — horizontal bars showing volume at each price level
+- **Returns distribution** — tick-to-tick return histogram (green/red)
+- **Rolling volatility** — 50-tick rolling std dev with min/max/mean
+- **Summary statistics** — table with mean, std, range, spread, autocorrelation, drift, and trade metrics
 
-## Deploy on Vercel
+## Dependencies
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `dash` + `plotly` — interactive web dashboard
+- `pandas` + `numpy` — data processing
