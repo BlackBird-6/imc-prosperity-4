@@ -5,8 +5,9 @@ Interactive market data dashboard for IMC Prosperity 4, built with Plotly Dash.
 ## Quick Start
 
 ```bash
+# From the project root
 pip install -r requirements.txt
-python app.py
+python imc4-visualizer/app.py
 ```
 
 Open **http://localhost:8050** in your browser.
@@ -36,5 +37,4 @@ Days are stitched into a continuous timeline using `global_ts = day_index * 1,00
 
 ## Dependencies
 
-- `dash` + `plotly` — interactive web dashboard
-- `pandas` + `numpy` — data processing
+Managed via `requirements.txt` in the project root.

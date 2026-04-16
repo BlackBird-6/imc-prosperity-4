@@ -23,8 +23,28 @@ Reference materials and developer documentation.
 
 ## Getting Started
 
+Install all dependencies from the project root:
+
+```bash
+pip install -r requirements.txt
+```
+
 To run the interactive visualizer:
-1. Navigate to `imc4-visualizer/`.
-2. Install dependencies: `pip install -r requirements.txt`.
-3. Run the app: `python app.py`.
-4. Open your browser at **http://localhost:8050**.
+1. Run: `python imc4-visualizer/app.py`
+2. Open your browser at **http://localhost:8050**.
+
+To run the backtester ([source](https://github.com/Xeeshan85/imc-prosperity-4-backtester)):
+```bash
+# Run — the number is the round number (--merge-pnl stitches all days into a continuous PnL curve)
+prosperity4btest algos/ROUND<N>/<algo>.py <round> --merge-pnl
+prosperity4btest algos/ROUND1/mean_reversion_v5.py 1 --merge-pnl
+
+# Run and auto-open the visualizer (jmerle) in your browser
+prosperity4btest algos/ROUND<N>/<algo>.py <round> --merge-pnl --vis
+prosperity4btest algos/ROUND1/mean_reversion_v5.py 1 --merge-pnl --vis
+
+# Save output log manually, then open at https://jmerle.github.io/imc-prosperity-3-visualizer
+prosperity4btest algos/ROUND1/mean_reversion_v5.py 1 --out my_run.log
+```
+
+By default the backtester saves logs to `algos/ROUND1/logs/` — this folder is gitignored.

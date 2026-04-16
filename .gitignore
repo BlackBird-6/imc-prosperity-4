@@ -1,2 +1,5 @@
 imc-prosperity-3-visualizer/*
 algos/ROUND1/logs/*
+.venv
+backtests/
+**/__pycache__

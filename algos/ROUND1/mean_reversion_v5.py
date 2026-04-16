@@ -2,6 +2,87 @@ from datamodel import OrderDepth, UserId, TradingState, Order
 from typing import List
 import json
 
+class Logger:
+    def __init__(self) -> None:
+        self.logs = ""
+        self.max_log_length = 3750
+
+    def print(self, *objects, sep=" ", end="\n") -> None:
+        self.logs += sep.join(map(str, objects)) + end
+
+    def flush(self, state: TradingState, orders, conversions, trader_data) -> None:
+        base_length = len(
+            self.to_json([
+                self.compress_state(state, ""),
+                self.compress_orders(orders),
+                conversions,
+                "",
+                "",
+            ])
+        )
+        max_item_length = (self.max_log_length - base_length) // 3
+        print(
+            self.to_json([
+                self.compress_state(state, self.truncate(state.traderData, max_item_length)),
+                self.compress_orders(orders),
+                conversions,
+                self.truncate(trader_data, max_item_length),
+                self.truncate(self.logs, max_item_length),
+            ])
+        )
+        self.logs = ""
+
+    def compress_state(self, state: TradingState, trader_data: str):
+        return [
+            state.timestamp,
+            trader_data,
+            self.compress_listings(state.listings),
+            self.compress_order_depths(state.order_depths),
+            self.compress_trades(state.own_trades),
+            self.compress_trades(state.market_trades),
+            state.position,
+            self.compress_observations(state.observations),
+        ]
+
+    def compress_listings(self, listings):
+        return [[l.symbol, l.product, l.denomination] for l in listings.values()]
+
+    def compress_order_depths(self, order_depths):
+        return {s: [od.buy_orders, od.sell_orders] for s, od in order_depths.items()}
+
+    def compress_trades(self, trades):
+        return [[t.symbol, t.price, t.quantity, t.buyer, t.seller, t.timestamp]
+                for arr in trades.values() for t in arr]
+
+    def compress_observations(self, observations):
+        co = {}
+        for product, obs in observations.conversionObservations.items():
+            co[product] = [obs.bidPrice, obs.askPrice, obs.transportFees,
+                           obs.exportTariff, obs.importTariff, obs.sugarPrice, obs.sunlightIndex]
+        return [observations.plainValueObservations, co]
+
+    def compress_orders(self, orders):
+        return [[o.symbol, o.price, o.quantity] for arr in orders.values() for o in arr]
+
+    def to_json(self, value) -> str:
+        return json.dumps(value, cls=ProsperityEncoder, separators=(",", ":"))
+
+    def truncate(self, value: str, max_length: int) -> str:
+        if len(value) <= max_length:
+            return value
+        return value[:max_length - 3] + "..."
+
+
+class ProsperityEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, "__dict__"):
+            return obj.__dict__
+        return super().default(obj)
+
+
+logger = Logger()
+
+
 class Trader:
 
     # ── ASH_COATED_OSMIUM ──────────────────────────────────────────
@@ -37,7 +118,9 @@ class Trader:
         if self.IPR in state.order_depths:
             result[self.IPR] = self.trade_ipr(state, data)
 
-        return result, conversions, json.dumps(data)
+        trader_data = json.dumps(data)
+        logger.flush(state, result, conversions, trader_data)
+        return result, conversions, trader_data
 
     def trade_aco(self, state: TradingState, data: dict) -> List[Order]:
         """
