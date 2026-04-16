@@ -521,12 +521,12 @@ def update_price_chart(n_clicks, product, round_name, min_ts, max_ts, data_range
     has_both = p["bid_price_1"].notna() & p["ask_price_1"].notna()
     p_ba = p[has_both]
     if len(p_ba) > 0:
-        fig.add_trace(go.Scatter(
+        fig.add_trace(go.Scattergl(
             x=p_ba["global_ts"], y=p_ba["ask_price_1"],
             mode="lines", line=dict(width=0),
             showlegend=False, hoverinfo="skip",
         ))
-        fig.add_trace(go.Scatter(
+        fig.add_trace(go.Scattergl(
             x=p_ba["global_ts"], y=p_ba["bid_price_1"],
             mode="lines", line=dict(width=0),
             fill="tonexty", fillcolor="rgba(59,130,246,0.1)",
@@ -534,7 +534,7 @@ def update_price_chart(n_clicks, product, round_name, min_ts, max_ts, data_range
         ))
 
     # Mid-price line
-    fig.add_trace(go.Scatter(
+    fig.add_trace(go.Scattergl(
         x=p["global_ts"], y=p["mid_price"],
         mode="lines", name="Mid Price",
         line=dict(color=COLORS["blue"], width=1.5),
@@ -545,7 +545,7 @@ def update_price_chart(n_clicks, product, round_name, min_ts, max_ts, data_range
     has_bid = p["bid_price_1"].notna() & p["bid_volume_1"].notna()
     p_bid = p[has_bid]
     if len(p_bid) > 0:
-        fig.add_trace(go.Scatter(
+        fig.add_trace(go.Scattergl(
             x=p_bid["global_ts"], y=p_bid["bid_price_1"],
             mode="markers", name="Buy Orders (L1)",
             marker=dict(
@@ -559,7 +559,7 @@ def update_price_chart(n_clicks, product, round_name, min_ts, max_ts, data_range
     has_ask = p["ask_price_1"].notna() & p["ask_volume_1"].notna()
     p_ask = p[has_ask]
     if len(p_ask) > 0:
-        fig.add_trace(go.Scatter(
+        fig.add_trace(go.Scattergl(
             x=p_ask["global_ts"], y=p_ask["ask_price_1"],
             mode="markers", name="Sell Orders (L1)",
             marker=dict(
