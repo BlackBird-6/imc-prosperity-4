@@ -145,8 +145,14 @@ class Trader:
         price_change = current_mid - prev_mid
         momentum_skew = -price_change * 0.5 
         
-        # Inventory risk skew
-        inventory_skew = -(pos / self.ACO_LIMIT) * 4.0
+        # Non-linear Inventory Risk Skew (Cubic)
+        # Keeps skew low when inventory is small, but intensely penalizes near the limit.
+        inventory_skew = -((pos / self.ACO_LIMIT) ** 3) * 12.0
+
+        if(pos == 80):
+            logger.print("Position is at long limit")
+        if(pos == -80):
+            logger.print("Position is at short limit")
         
         adjusted_fair = self.ACO_FAIR + momentum_skew + inventory_skew
         
