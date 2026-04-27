@@ -1,0 +1,13 @@
+OPTION,EXPIRY,SIZE_BID,BID,ASK,SIZE_ASK,DESCRIPTION
+AC,N/A,200,49.975,50.025,200,AETHER_CRYSTAL: The underlying asset for all derivatives.
+AC_50_P,T + 21,50,12.000,12.050,50,Standard Put Option: Strike price 50; 3-week expiry.
+AC_50_C,T + 21,50,12.000,12.050,50,Standard Call Option: Strike price 50; 3-week expiry.
+AC_35_P,T + 21,50,4.330,4.350,50,Standard Put Option: Strike price 35; 3-week expiry.
+AC_40_P,T + 21,50,6.500,6.550,50,Standard Put Option: Strike price 40; 3-week expiry.
+AC_45_P,T + 21,50,9.050,9.100,50,Standard Put Option: Strike price 45; 3-week expiry.
+AC_60_C,T + 21,50,8.800,8.850,50,Standard Call Option: Strike price 60; 3-week expiry.
+AC_50_P_2,T + 14,50,9.700,9.750,50,Standard Put Option: Strike price 50; 2-week expiry.
+AC_50_C_2,T + 14,50,9.700,9.750,50,Standard Call Option: Strike price 50; 2-week expiry.
+AC_50_CO,T + 14/21,50,22.200,22.300,50,Chooser Option: Strike price 50. Becomes Call or Put at T+14; expires at T+21.
+AC_40_BP,T + 21,50,5.000,5.100,50,Binary Put Option: Strike price 40. Pays fixed amount if underlying < 40 at expiry.
+AC_45_KO,T + 21,500,0.150,0.175,500,Knock-Out Put Option: Strike price 45. Immediately worthless if barrier is breached.
