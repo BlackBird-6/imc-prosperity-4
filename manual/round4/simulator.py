@@ -182,7 +182,7 @@ def main():
 
     # Plotting
     print("Generating plots...")
-    fig, (ax1, ax2, ax3) = plt.subplots(3, 1, figsize=(14, 16), gridspec_kw={'height_ratios': [3, 1, 2]})
+    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(14, 20), gridspec_kw={'height_ratios': [3, 1, 2, 2]})
     fig.suptitle(f"Aether Crystal Options Simulation | Sims: {args.sims} | Seed: {seed}", fontsize=16, fontweight='bold')
 
     # Plot 1: Asset Paths (plot up to 500 to avoid freezing)
@@ -253,8 +253,58 @@ def main():
         table.set_fontsize(10)
         table.scale(1, 1.8)
         ax3.set_title("PnL Distribution Percentiles (Across all trials)", pad=20, fontsize=12)
+
+        # Plot 4: Batched Mean Portfolio PnL
+        ax4.axis('off')
+        batch_size = 100
+        max_trials_to_batch = min(args.sims, 2000)
+        
+        batch_labels = []
+        batch_means = []
+        
+        for i in range(0, max_trials_to_batch, batch_size):
+            end_idx = min(i + batch_size, max_trials_to_batch)
+            batch_data = total_pnl_per_trial[i:end_idx]
+            batch_mean = np.mean(batch_data)
+            
+            batch_labels.append(f"{i+1}-{end_idx}")
+            batch_means.append(f"{batch_mean:,.0f}")
+        
+        # Reshape into multiple columns if there are many batches
+        num_batches = len(batch_labels)
+        rows = (num_batches + 1) // 2
+        
+        batch_cell_text = []
+        for r in range(rows):
+            row_data = []
+            idx1 = r
+            idx2 = r + rows
+            
+            # First column pair
+            row_data.extend([batch_labels[idx1], batch_means[idx1]])
+            
+            # Second column pair
+            if idx2 < num_batches:
+                row_data.extend([batch_labels[idx2], batch_means[idx2]])
+            else:
+                row_data.extend(["", ""])
+                
+            batch_cell_text.append(row_data)
+            
+        batch_table = ax4.table(cellText=batch_cell_text,
+                                colLabels=["Trials", "Mean Total PnL", "Trials", "Mean Total PnL"],
+                                loc='center',
+                                cellLoc='center',
+                                colWidths=[0.15, 0.2, 0.15, 0.2])
+        batch_table.auto_set_font_size(False)
+        batch_table.set_fontsize(10)
+        batch_table.scale(1, 1.5)
+        ax4.set_title("Batched Mean Portfolio PnL (First 2000 trials)", pad=20, fontsize=12)
+
     else:
         ax3.text(0.5, 0.5, "No positions to plot", ha='center', va='center')
+        ax4.axis('off')
+        ax4.text(0.5, 0.5, "No positions to plot", ha='center', va='center')
 
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     
