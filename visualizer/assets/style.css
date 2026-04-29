@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+    padding: 0;
+    background: #0d1117;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0d1117; }
+::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #484f58; }
+
+/* Dropdown overrides */
+.Select-control { background: #161b22 !important; border-color: #30363d !important; }
+.Select-menu-outer { background: #161b22 !important; border-color: #30363d !important; }
+.Select-option { background: #161b22 !important; color: #c9d1d9 !important; }
+.Select-option.is-focused { background: #21262d !important; }
+.Select-value-label { color: #c9d1d9 !important; }
+.Select-placeholder { color: #8b949e !important; }
+
+/* DataTable cells */
+.dash-table-container .dash-spreadsheet-container .dash-spreadsheet-inner td {
+    white-space: nowrap !important;
+}
+
+/* Details summary arrow */
+details > summary { list-style: none; }
+details > summary::before { content: "▶ "; font-size: 10px; }
+details[open] > summary::before { content: "▼ "; font-size: 10px; }
+
+/* Tab strip */
+.custom-tabs .tab { padding: 6px 14px !important; }
