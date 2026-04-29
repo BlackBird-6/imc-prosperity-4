@@ -3,3 +3,4 @@ algos/ROUND1/logs/*
 .venv
 backtests/
 **/__pycache__
+**/trials/*
