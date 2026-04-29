@@ -233,6 +233,17 @@ def main():
         labels.append("TOTAL PORTFOLIO")
         data.append(total_pnl_per_trial)
         
+        # Add BATCHED 100 TOTAL PORTFOLIO AVG
+        batch_size = 100
+        num_full_batches = len(total_pnl_per_trial) // batch_size
+        if num_full_batches > 0:
+            batched_data = np.mean(total_pnl_per_trial[:num_full_batches * batch_size].reshape(-1, batch_size), axis=1)
+            labels.append("100-BATCHED PORTFOLIO AVG")
+            data.append(batched_data)
+        elif len(total_pnl_per_trial) > 0:
+            labels.append("100-BATCHED PORTFOLIO AVG")
+            data.append(np.array([np.mean(total_pnl_per_trial)]))
+        
         percentile_names = ['Mean', 'Min', '1%', '10%', '25%', '50%', '75%', '90%', '99%', 'Max']
         percentiles_to_calc = [0, 1, 10, 25, 50, 75, 90, 99, 100]
         
@@ -257,7 +268,7 @@ def main():
         # Plot 4: Batched Mean Portfolio PnL
         ax4.axis('off')
         batch_size = 100
-        max_trials_to_batch = min(args.sims, 2000)
+        max_trials_to_batch = min(args.sims, 5000)
         
         batch_labels = []
         batch_means = []
@@ -272,34 +283,42 @@ def main():
         
         # Reshape into multiple columns if there are many batches
         num_batches = len(batch_labels)
-        rows = (num_batches + 1) // 2
+        cols_pairs = 5
+        rows = (num_batches + cols_pairs - 1) // cols_pairs
         
         batch_cell_text = []
         for r in range(rows):
             row_data = []
-            idx1 = r
-            idx2 = r + rows
-            
-            # First column pair
-            row_data.extend([batch_labels[idx1], batch_means[idx1]])
-            
-            # Second column pair
-            if idx2 < num_batches:
-                row_data.extend([batch_labels[idx2], batch_means[idx2]])
-            else:
-                row_data.extend(["", ""])
-                
+            for c in range(cols_pairs):
+                idx = c * rows + r
+                if idx < num_batches:
+                    row_data.extend([batch_labels[idx], batch_means[idx]])
+                else:
+                    row_data.extend(["", ""])
             batch_cell_text.append(row_data)
             
+        col_labels = ["Trials", "Mean PnL"] * cols_pairs
+        col_widths = [0.1, 0.15] * cols_pairs
+            
         batch_table = ax4.table(cellText=batch_cell_text,
-                                colLabels=["Trials", "Mean Total PnL", "Trials", "Mean Total PnL"],
+                                colLabels=col_labels,
                                 loc='center',
                                 cellLoc='center',
-                                colWidths=[0.15, 0.2, 0.15, 0.2])
+                                colWidths=col_widths)
         batch_table.auto_set_font_size(False)
         batch_table.set_fontsize(10)
         batch_table.scale(1, 1.5)
-        ax4.set_title("Batched Mean Portfolio PnL (First 2000 trials)", pad=20, fontsize=12)
+        
+        # Color the Mean PnL cells
+        for r in range(rows):
+            for c in range(cols_pairs):
+                idx = c * rows + r
+                if idx < num_batches:
+                    mean_val = float(batch_means[idx].replace(',', ''))
+                    color = '#d4edda' if mean_val > 0 else '#f8d7da' if mean_val < 0 else 'white'
+                    batch_table[(r + 1, c * 2 + 1)].set_facecolor(color)
+                    
+        ax4.set_title("Batched Mean Portfolio PnL (First 5000 trials)", pad=20, fontsize=12)
 
     else:
         ax3.text(0.5, 0.5, "No positions to plot", ha='center', va='center')
